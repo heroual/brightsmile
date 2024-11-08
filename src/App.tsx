@@ -1,25 +1,23 @@
 import React from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Services from './components/Services';
-import About from './components/About';
-import Team from './components/Team';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import HomePage from './pages/HomePage';
+import SignIn from './components/auth/SignIn';
+import SignUp from './components/auth/SignUp';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main>
-        <Hero />
-        <Services />
-        <About />
-        <Team />
-        <Contact />
-      </main>
-      <Footer />
-    </div>
+    <Router>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Routes>
+      </AuthProvider>
+    </Router>
   );
 }
 

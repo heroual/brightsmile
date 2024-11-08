@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Stethoscope, UserCircle2, Menu, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { currentUser, signOut } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,20 +18,28 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleAuthClick = () => {
+    if (currentUser) {
+      signOut();
+    } else {
+      navigate('/signin');
+    }
+  };
+
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${
       isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <div className="flex items-center">
+          <Link to="/" className="flex items-center">
             <Stethoscope className="h-8 w-8 text-blue-600" />
             <span className={`ml-2 text-xl font-semibold ${
               isScrolled ? 'text-gray-900' : 'text-white'
             }`}>
               BrightSmile Dentaire
             </span>
-          </div>
+          </Link>
           
           <div className="hidden md:flex items-center space-x-8">
             <a href="#services" className={`${
@@ -50,9 +62,12 @@ export default function Navbar() {
             } hover:text-blue-600 transition`}>
               Contact
             </a>
-            <button className="flex items-center space-x-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+            <button 
+              onClick={handleAuthClick}
+              className="flex items-center space-x-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+            >
               <UserCircle2 className="h-4 w-4" />
-              <span>Se Connecter</span>
+              <span>{currentUser ? 'Se déconnecter' : 'Se Connecter'}</span>
             </button>
           </div>
           
@@ -99,9 +114,15 @@ export default function Navbar() {
             >
               Contact
             </a>
-            <button className="w-full flex items-center justify-center space-x-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+            <button 
+              onClick={() => {
+                handleAuthClick();
+                setIsOpen(false);
+              }}
+              className="w-full flex items-center justify-center space-x-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+            >
               <UserCircle2 className="h-4 w-4" />
-              <span>Se Connecter</span>
+              <span>{currentUser ? 'Se déconnecter' : 'Se Connecter'}</span>
             </button>
           </div>
         </div>
