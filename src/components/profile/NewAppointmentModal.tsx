@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -10,6 +10,13 @@ interface NewAppointmentModalProps {
   onClose: () => void;
 }
 
+const WORKING_HOURS = {
+  morning: { start: 9, end: 12 },
+  afternoon: { start: 14, end: 18 }
+};
+
+const DAYS_OF_WEEK = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
 export default function NewAppointmentModal({ isOpen, onClose }: NewAppointmentModalProps) {
   const { currentUser } = useAuth();
   const [formData, setFormData] = useState({
@@ -18,8 +25,40 @@ export default function NewAppointmentModal({ isOpen, onClose }: NewAppointmentM
     reason: ''
   });
   const [loading, setLoading] = useState(false);
+  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (formData.date) {
+      generateTimeSlots(formData.date);
+    }
+  }, [formData.date]);
+
+  const generateTimeSlots = (selectedDate: string) => {
+    const date = new Date(selectedDate);
+    const dayOfWeek = DAYS_OF_WEEK[date.getDay()];
+    
+    // Only generate slots for Monday to Friday
+    if (dayOfWeek === 'sunday' || dayOfWeek === 'saturday') {
+      setAvailableSlots([]);
+      return;
+    }
+
+    const slots: string[] = [];
+    
+    // Morning slots
+    for (let hour = WORKING_HOURS.morning.start; hour < WORKING_HOURS.morning.end; hour++) {
+      slots.push(`${hour.toString().padStart(2, '0')}:00`);
+      slots.push(`${hour.toString().padStart(2, '0')}:30`);
+    }
+    
+    // Afternoon slots
+    for (let hour = WORKING_HOURS.afternoon.start; hour < WORKING_HOURS.afternoon.end; hour++) {
+      slots.push(`${hour.toString().padStart(2, '0')}:00`);
+      slots.push(`${hour.toString().padStart(2, '0')}:30`);
+    }
+
+    setAvailableSlots(slots);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +86,10 @@ export default function NewAppointmentModal({ isOpen, onClose }: NewAppointmentM
       setLoading(false);
     }
   };
+
+  if (!isOpen) return null;
+
+  const today = new Date().toISOString().split('T')[0];
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -77,6 +120,7 @@ export default function NewAppointmentModal({ isOpen, onClose }: NewAppointmentM
                   type="date"
                   id="date"
                   required
+                  min={today}
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -87,14 +131,20 @@ export default function NewAppointmentModal({ isOpen, onClose }: NewAppointmentM
                 <label htmlFor="time" className="block text-sm font-medium text-gray-700">
                   Heure
                 </label>
-                <input
-                  type="time"
+                <select
                   id="time"
                   required
                   value={formData.time}
                   onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
+                >
+                  <option value="">Sélectionnez une heure</option>
+                  {availableSlots.map((slot) => (
+                    <option key={slot} value={slot}>
+                      {slot}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>

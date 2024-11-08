@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -16,8 +18,37 @@ export default function SignIn() {
     try {
       setError('');
       setLoading(true);
+
+      // Check for doctor credentials
+      if (email === 'admin' && password === 'admin123') {
+        await signIn('admin@brightsmile.com', 'admin123');
+        const userDoc = await getDoc(doc(db, 'users', 'admin'));
+        
+        if (!userDoc.exists()) {
+          // Create doctor profile if it doesn't exist
+          await setDoc(doc(db, 'users', 'admin'), {
+            email: 'admin@brightsmile.com',
+            displayName: 'Dr. Administrator',
+            role: 'doctor',
+            phoneNumber: '',
+            dateOfBirth: '',
+            address: '',
+            medicalHistory: [],
+            appointments: []
+          });
+        }
+        navigate('/doctor');
+        return;
+      }
+
+      // Regular user sign in
       await signIn(email, password);
-      navigate('/profile');
+      const userDoc = await getDoc(doc(db, 'users', 'regular-user-id'));
+      if (userDoc.exists() && userDoc.data().role === 'doctor') {
+        navigate('/doctor');
+      } else {
+        navigate('/profile');
+      }
     } catch (err) {
       setError('Failed to sign in. Please check your credentials.');
     } finally {
@@ -59,12 +90,12 @@ export default function SignIn() {
                 </div>
                 <input
                   id="email"
-                  type="email"
+                  type="text"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="Adresse email"
+                  placeholder="Email ou nom d'utilisateur"
                 />
               </div>
             </div>

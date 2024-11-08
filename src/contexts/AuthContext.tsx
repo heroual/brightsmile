@@ -8,24 +8,7 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
-
-interface UserProfile {
-  email: string;
-  displayName: string;
-  phoneNumber: string;
-  dateOfBirth: string;
-  address: string;
-  medicalHistory: string[];
-  appointments: Appointment[];
-}
-
-export interface Appointment {
-  id: string;
-  date: string;
-  time: string;
-  reason: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
-}
+import { UserProfile, Appointment } from '../types/auth';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -79,7 +62,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, profile: Omit<UserProfile, 'uid'>) => {
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
-      await setDoc(doc(db, 'users', user.uid), profile);
+      await setDoc(doc(db, 'users', user.uid), {
+        ...profile,
+        role: 'patient' // Default role for new sign-ups
+      });
     } catch (err) {
       console.error('Error during sign up:', err);
       throw err;

@@ -5,6 +5,8 @@ import HomePage from './pages/HomePage';
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
 import ProfilePage from './pages/ProfilePage';
+import DoctorDashboard from './pages/DoctorDashboard';
+import PrivateRoute from './components/auth/PrivateRoute';
 
 function App() {
   return (
@@ -15,6 +17,14 @@ function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route 
+            path="/doctor" 
+            element={
+              <PrivateRoute role="doctor">
+                <DoctorDashboard />
+              </PrivateRoute>
+            } 
+          />
         </Routes>
       </AuthProvider>
     </Router>

@@ -7,6 +7,7 @@ export interface UserProfile {
     address: string;
     medicalHistory: string[];
     appointments: Appointment[];
+    role: 'doctor' | 'patient';
   }
   
   export interface Appointment {
