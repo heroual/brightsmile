@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db, auth } from '../../firebase';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -22,21 +22,19 @@ export default function SignIn() {
       // Check for doctor credentials
       if (email === 'admin@brightsmile.com' && password === 'admin123') {
         await signIn(email, password);
-        const userDoc = await getDoc(doc(db, 'users', 'admin'));
         
-        if (!userDoc.exists()) {
-          // Create doctor profile if it doesn't exist
-          await setDoc(doc(db, 'users', 'admin'), {
-            email: 'admin@brightsmile.com',
-            displayName: 'Dr. Administrator',
-            role: 'doctor',
-            phoneNumber: '',
-            dateOfBirth: '',
-            address: '',
-            medicalHistory: [],
-            appointments: []
-          });
-        }
+        // Create or update doctor profile
+        await setDoc(doc(db, 'users', auth.currentUser?.uid || 'admin'), {
+          email: 'admin@brightsmile.com',
+          displayName: 'Dr. Administrator',
+          role: 'doctor',
+          phoneNumber: '',
+          dateOfBirth: '',
+          address: '',
+          medicalHistory: [],
+          appointments: []
+        }, { merge: true });
+        
         navigate('/doctor');
         return;
       }
@@ -44,6 +42,7 @@ export default function SignIn() {
       // Regular user sign in
       await signIn(email, password);
       const userDoc = await getDoc(doc(db, 'users', auth.currentUser?.uid || ''));
+      
       if (userDoc.exists() && userDoc.data().role === 'doctor') {
         navigate('/doctor');
       } else {
