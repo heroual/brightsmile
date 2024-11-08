@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 
 export default function SignIn() {
@@ -20,8 +20,8 @@ export default function SignIn() {
       setLoading(true);
 
       // Check for doctor credentials
-      if (email === 'admin' && password === 'admin123') {
-        await signIn('admin@brightsmile.com', 'admin123');
+      if (email === 'admin@brightsmile.com' && password === 'admin123') {
+        await signIn(email, password);
         const userDoc = await getDoc(doc(db, 'users', 'admin'));
         
         if (!userDoc.exists()) {
@@ -43,7 +43,7 @@ export default function SignIn() {
 
       // Regular user sign in
       await signIn(email, password);
-      const userDoc = await getDoc(doc(db, 'users', 'regular-user-id'));
+      const userDoc = await getDoc(doc(db, 'users', auth.currentUser?.uid || ''));
       if (userDoc.exists() && userDoc.data().role === 'doctor') {
         navigate('/doctor');
       } else {
@@ -90,12 +90,12 @@ export default function SignIn() {
                 </div>
                 <input
                   id="email"
-                  type="text"
+                  type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="Email ou nom d'utilisateur"
+                  placeholder="Adresse email"
                 />
               </div>
             </div>
