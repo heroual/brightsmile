@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { collection, query, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Calendar, Clock, User, FileText } from 'lucide-react';
+import { Calendar, Clock, User, FileText, Plus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import NewAppointmentModal from '../components/profile/NewAppointmentModal';
 
 export default function DoctorDashboard() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [patients, setPatients] = useState<any[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { signOut } = useAuth();
 
   useEffect(() => {
@@ -48,7 +50,12 @@ export default function DoctorDashboard() {
     const patient = patients.find(p => p.id === patientId);
     
     if (patient) {
-      const updatedHistory = [...(patient.medicalHistory || []), newRecord];
+      const updatedHistory = [...(patient.medicalHistory || []), {
+        date: new Date().toISOString(),
+        note: newRecord,
+        doctor: 'Dr. Administrator'
+      }];
+      
       await updateDoc(patientRef, {
         medicalHistory: updatedHistory
       });
@@ -57,6 +64,12 @@ export default function DoctorDashboard() {
       setPatients(patients.map(p => 
         p.id === patientId ? { ...p, medicalHistory: updatedHistory } : p
       ));
+    }
+  };
+
+  const handleScheduleFollowUp = () => {
+    if (selectedPatient) {
+      setIsModalOpen(true);
     }
   };
 
@@ -109,7 +122,16 @@ export default function DoctorDashboard() {
             <>
               {/* Appointments */}
               <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold mb-4">Rendez-vous</h2>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-semibold">Rendez-vous</h2>
+                  <button
+                    onClick={handleScheduleFollowUp}
+                    className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>Programmer un suivi</span>
+                  </button>
+                </div>
                 <div className="space-y-4">
                   {selectedPatient.appointments?.map((apt: any) => (
                     <div key={apt.id} className="border rounded-lg p-4">
@@ -125,10 +147,14 @@ export default function DoctorDashboard() {
                         >
                           <option value="pending">En attente</option>
                           <option value="confirmed">Confirmé</option>
+                          <option value="completed">Terminé</option>
                           <option value="cancelled">Annulé</option>
                         </select>
                       </div>
                       <p className="text-gray-600">{apt.reason}</p>
+                      {apt.notes && (
+                        <p className="text-sm text-gray-500 mt-2">Notes: {apt.notes}</p>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -138,12 +164,16 @@ export default function DoctorDashboard() {
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-lg font-semibold mb-4">Dossier Médical</h2>
                 <div className="space-y-4">
-                  {selectedPatient.medicalHistory?.map((record: string, index: number) => (
+                  {selectedPatient.medicalHistory?.map((record: any, index: number) => (
                     <div key={index} className="border rounded-lg p-4">
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 mb-2">
                         <FileText className="h-5 w-5 text-blue-500" />
-                        <span>{record}</span>
+                        <span className="font-medium">
+                          {new Date(record.date).toLocaleDateString('fr-FR')}
+                        </span>
                       </div>
+                      <p className="text-gray-600">{record.note}</p>
+                      <p className="text-sm text-gray-500 mt-1">{record.doctor}</p>
                     </div>
                   ))}
                   <form
@@ -176,6 +206,15 @@ export default function DoctorDashboard() {
           )}
         </div>
       </div>
+
+      {selectedPatient && (
+        <NewAppointmentModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          patientId={selectedPatient.id}
+          isDoctor={true}
+        />
+      )}
     </div>
   );
 }

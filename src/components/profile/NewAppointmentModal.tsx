@@ -8,6 +8,8 @@ import { Appointment } from '../../types/auth';
 interface NewAppointmentModalProps {
   isOpen: boolean;
   onClose: () => void;
+  patientId?: string;
+  isDoctor?: boolean;
 }
 
 const WORKING_HOURS = {
@@ -18,14 +20,15 @@ const WORKING_HOURS = {
 const DAYS_OF_WEEK = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 const APPOINTMENT_DURATION = 30; // minutes
 
-export default function NewAppointmentModal({ isOpen, onClose }: NewAppointmentModalProps) {
+export default function NewAppointmentModal({ isOpen, onClose, patientId, isDoctor = false }: NewAppointmentModalProps) {
   const { currentUser } = useAuth();
   const [formData, setFormData] = useState({
     date: '',
     time: '',
     reason: '',
     symptoms: '',
-    urgency: 'normal'
+    urgency: 'normal',
+    notes: ''
   });
   const [loading, setLoading] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
@@ -91,7 +94,7 @@ export default function NewAppointmentModal({ isOpen, onClose }: NewAppointmentM
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentUser) return;
+    if (!currentUser && !patientId) return;
 
     try {
       setLoading(true);
@@ -101,12 +104,12 @@ export default function NewAppointmentModal({ isOpen, onClose }: NewAppointmentM
         time: formData.time,
         reason: formData.reason,
         symptoms: formData.symptoms,
-        urgency: formData.urgency,
-        status: 'pending',
-        notes: ''
+        urgency: formData.urgency as 'normal' | 'urgent' | 'emergency',
+        status: isDoctor ? 'confirmed' : 'pending',
+        notes: formData.notes
       };
 
-      const userRef = doc(db, 'users', currentUser.uid);
+      const userRef = doc(db, 'users', patientId || currentUser?.uid || '');
       await updateDoc(userRef, {
         appointments: arrayUnion(newAppointment)
       });
@@ -137,7 +140,7 @@ export default function NewAppointmentModal({ isOpen, onClose }: NewAppointmentM
 
           <div className="p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Nouveau Rendez-vous
+              {isDoctor ? 'Programmer un rendez-vous de suivi' : 'Nouveau Rendez-vous'}
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -201,40 +204,60 @@ export default function NewAppointmentModal({ isOpen, onClose }: NewAppointmentM
                     value={formData.reason}
                     onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                     className="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="Ex: Consultation, Contrôle..."
+                    placeholder={isDoctor ? "Contrôle de suivi" : "Ex: Consultation, Contrôle..."}
                   />
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="symptoms" className="block text-sm font-medium text-gray-700">
-                  Symptômes ou Description
-                </label>
-                <textarea
-                  id="symptoms"
-                  value={formData.symptoms}
-                  onChange={(e) => setFormData({ ...formData, symptoms: e.target.value })}
-                  rows={3}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="Décrivez vos symptômes ou la raison de votre visite..."
-                />
-              </div>
+              {!isDoctor && (
+                <div>
+                  <label htmlFor="symptoms" className="block text-sm font-medium text-gray-700">
+                    Symptômes ou Description
+                  </label>
+                  <textarea
+                    id="symptoms"
+                    value={formData.symptoms}
+                    onChange={(e) => setFormData({ ...formData, symptoms: e.target.value })}
+                    rows={3}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Décrivez vos symptômes ou la raison de votre visite..."
+                  />
+                </div>
+              )}
 
-              <div>
-                <label htmlFor="urgency" className="block text-sm font-medium text-gray-700">
-                  Niveau d'urgence
-                </label>
-                <select
-                  id="urgency"
-                  value={formData.urgency}
-                  onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-                  <option value="normal">Normal</option>
-                  <option value="urgent">Urgent</option>
-                  <option value="emergency">Urgence immédiate</option>
-                </select>
-              </div>
+              {isDoctor && (
+                <div>
+                  <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
+                    Notes médicales
+                  </label>
+                  <textarea
+                    id="notes"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    rows={3}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Notes pour le rendez-vous de suivi..."
+                  />
+                </div>
+              )}
+
+              {!isDoctor && (
+                <div>
+                  <label htmlFor="urgency" className="block text-sm font-medium text-gray-700">
+                    Niveau d'urgence
+                  </label>
+                  <select
+                    id="urgency"
+                    value={formData.urgency}
+                    onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    <option value="normal">Normal</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="emergency">Urgence immédiate</option>
+                  </select>
+                </div>
+              )}
 
               <div className="mt-6">
                 <button
@@ -242,7 +265,7 @@ export default function NewAppointmentModal({ isOpen, onClose }: NewAppointmentM
                   disabled={loading}
                   className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                 >
-                  {loading ? 'Création...' : 'Créer le rendez-vous'}
+                  {loading ? 'Création...' : isDoctor ? 'Programmer le suivi' : 'Créer le rendez-vous'}
                 </button>
               </div>
             </form>
