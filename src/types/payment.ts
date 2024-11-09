@@ -1,27 +1,30 @@
 export interface Payment {
     id: string;
     patientId: string;
+    patientName: string;
+    treatmentType: string;
     amount: number;
     date: string;
-    paymentMethod: 'cash' | 'card' | 'insurance';
-    status: 'completed' | 'pending' | 'refunded';
-    description: string;
-    invoiceNumber: string;
-    treatments: Treatment[];
-    insuranceClaim?: InsuranceClaim;
+    status: 'paid' | 'pending' | 'cancelled';
+    paymentMethod: 'cash' | 'card' | 'transfer';
+    notes?: string;
   }
   
-  export interface Treatment {
+  export interface TreatmentType {
+    id: string;
     name: string;
-    code: string;
-    price: number;
-    quantity: number;
+    basePrice: number;
+    description: string;
+    category: string;
   }
   
-  export interface InsuranceClaim {
-    provider: string;
-    policyNumber: string;
-    coveragePercentage: number;
-    status: 'pending' | 'approved' | 'rejected';
-    claimNumber?: string;
+  export interface DailyStats {
+    totalRevenue: number;
+    totalPatients: number;
+    treatments: {
+      [key: string]: number;
+    };
+    paymentMethods: {
+      [key: string]: number;
+    };
   }

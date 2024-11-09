@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Users, BookOpen } from 'lucide-react';
+import { Users, BookOpen, CreditCard } from 'lucide-react';
 import PatientList from '../components/doctor/PatientList';
 import EducationManager from '../components/doctor/education/EducationManager';
+import PaymentManager from '../components/doctor/payment/PaymentManager';
 
 export default function DoctorDashboard() {
-  const [activeTab, setActiveTab] = useState<'patients' | 'education'>('patients');
+  const [activeTab, setActiveTab] = useState<'patients' | 'education' | 'payments'>('patients');
   const { signOut } = useAuth();
 
   return (
@@ -50,14 +51,27 @@ export default function DoctorDashboard() {
               <BookOpen className="h-5 w-5 mr-2" />
               Contenu Éducatif
             </button>
+            <button
+              onClick={() => setActiveTab('payments')}
+              className={`${
+                activeTab === 'payments'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } flex items-center whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              <CreditCard className="h-5 w-5 mr-2" />
+              Paiements
+            </button>
           </nav>
         </div>
 
         {/* Content */}
         {activeTab === 'patients' ? (
           <PatientList />
-        ) : (
+        ) : activeTab === 'education' ? (
           <EducationManager />
+        ) : (
+          <PaymentManager />
         )}
       </div>
     </div>
