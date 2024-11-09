@@ -5,6 +5,7 @@ import { CalendarDays, FileText, Clock, Settings } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import AppointmentList from '../components/profile/AppointmentList';
 import MedicalHistory from '../components/profile/MedicalHistory';
+import OralHealthPlan from '../components/profile/OralHealthPlan';
 
 export default function ProfilePage() {
   const { currentUser, userProfile, loading } = useAuth();
@@ -35,13 +36,13 @@ export default function ProfilePage() {
                   <CalendarDays className="h-5 w-5" />
                   <span>Rendez-vous</span>
                 </a>
+                <a href="#health-plan" className="flex items-center space-x-3 px-4 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600">
+                  <Clock className="h-5 w-5" />
+                  <span>Plan de Santé</span>
+                </a>
                 <a href="#medical-history" className="flex items-center space-x-3 px-4 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600">
                   <FileText className="h-5 w-5" />
                   <span>Dossier Médical</span>
-                </a>
-                <a href="#history" className="flex items-center space-x-3 px-4 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600">
-                  <Clock className="h-5 w-5" />
-                  <span>Historique</span>
                 </a>
                 <a href="#settings" className="flex items-center space-x-3 px-4 py-2 text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-600">
                   <Settings className="h-5 w-5" />
@@ -55,6 +56,10 @@ export default function ProfilePage() {
           <div className="md:col-span-3 space-y-6">
             <section id="appointments">
               <AppointmentList />
+            </section>
+
+            <section id="health-plan">
+              <OralHealthPlan />
             </section>
 
             <section id="medical-history">
