@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { UserProfile, Appointment } from '../../types/auth';
-import { Calendar, Phone, Mail, MapPin, ChevronDown, ChevronUp, Clock } from 'lucide-react';
+import { Calendar, Phone, Mail, MapPin, ChevronDown, ChevronUp, Clock, Receipt } from 'lucide-react';
 import NewAppointmentModal from '../profile/NewAppointmentModal';
 import HealthPlanDoctor from '../profile/health/HealthPlanDoctor';
+import PaymentModal from '../pos/PaymentModal';
+import PaymentHistory from '../pos/PaymentHistory';
 
 interface PatientCardProps {
   patient: UserProfile;
@@ -11,6 +13,7 @@ interface PatientCardProps {
 export default function PatientCard({ patient }: PatientCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   const getUpcomingAppointments = () => {
     if (!patient.appointments) return [];
@@ -51,12 +54,23 @@ export default function PatientCard({ patient }: PatientCardProps) {
             </div>
           </div>
           
-          <button
-            onClick={() => setIsAppointmentModalOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
-          >
-            Nouveau Rendez-vous
-          </button>
+          <div className="flex space-x-3">
+            <button
+              onClick={() => setIsPaymentModalOpen(true)}
+              className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
+            >
+              <Receipt className="h-4 w-4" />
+              <span>Nouveau Paiement</span>
+            </button>
+            
+            <button
+              onClick={() => setIsAppointmentModalOpen(true)}
+              className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+            >
+              <Calendar className="h-4 w-4" />
+              <span>Nouveau Rendez-vous</span>
+            </button>
+          </div>
         </div>
 
         <div className="mt-6">
@@ -115,8 +129,13 @@ export default function PatientCard({ patient }: PatientCardProps) {
       </div>
 
       {isExpanded && (
-        <div className="border-t border-gray-200 p-6">
-          <HealthPlanDoctor patientId={patient.uid} />
+        <div className="border-t border-gray-200">
+          <div className="p-6">
+            <HealthPlanDoctor patientId={patient.uid} />
+          </div>
+          <div className="p-6 border-t border-gray-200">
+            <PaymentHistory payments={patient.payments || []} />
+          </div>
         </div>
       )}
 
@@ -125,6 +144,13 @@ export default function PatientCard({ patient }: PatientCardProps) {
         onClose={() => setIsAppointmentModalOpen(false)}
         patientId={patient.uid}
         isDoctor={true}
+      />
+
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        patientId={patient.uid}
+        onSuccess={() => setIsPaymentModalOpen(false)}
       />
     </div>
   );
