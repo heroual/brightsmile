@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Users, BookOpen } from 'lucide-react';
-import PatientList from '../components/doctor/PatientList.tsx';
-import EducationManager from '../components/doctor/education/EducationManager.tsx';
+import PatientList from '../components/doctor/PatientList';
+import EducationManager from '../components/doctor/education/EducationManager';
 
 export default function DoctorDashboard() {
   const [activeTab, setActiveTab] = useState<'patients' | 'education'>('patients');
