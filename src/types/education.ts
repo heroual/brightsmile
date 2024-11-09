@@ -1,30 +1,33 @@
+export interface LearningObjective {
+  id: number;
+  text: string;
+}
+
+export interface Material {
+  id: number;
+  type: 'text' | 'video' | 'pdf' | 'quiz';
+  title: string;
+  content: string;
+}
+
 export interface EducationalContent {
-    id: string;
-    type: 'article' | 'video' | 'quiz' | 'infographic';
-    title: string;
-    description: string;
-    content: string;
-    thumbnail?: string;
-    category: string;
-    author: string;
-    createdAt: string;
-    updatedAt: string;
-    published: boolean;
-    videoUrl?: string;
-    readTime?: string;
-    questions?: QuizQuestion[];
-  }
-  
-  export interface QuizQuestion {
-    id: string;
-    question: string;
-    options: string[];
-    correctAnswer: number;
-    explanation: string;
-  }
-  
-  export interface Category {
-    id: string;
-    name: string;
-    slug: string;
-  }
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  level: 'beginner' | 'intermediate' | 'advanced';
+  duration: string;
+  learningObjectives: LearningObjective[];
+  materials: Material[];
+  prerequisites: string;
+  status: 'draft' | 'published' | 'archived';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ContentFilters {
+  search: string;
+  category: string;
+  level: string;
+  status: string;
+}
