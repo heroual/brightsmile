@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import { Tooth, CheckCircle2, Calendar, AlertTriangle } from 'lucide-react';
+import { Stethoscope, CheckCircle2, Calendar, AlertTriangle } from 'lucide-react';
 import ProgressTracker from './health/ProgressTracker';
 import DailyRoutine from './health/DailyRoutine';
 import { OralHealthPlan } from '../../types/health';
 
-export default function OralHealthPlan() {
+export default function OralHealthPlanView() {
   const { currentUser } = useAuth();
   const [healthPlan, setHealthPlan] = useState<OralHealthPlan | null>(null);
   const [loading, setLoading] = useState(true);
@@ -66,7 +66,7 @@ export default function OralHealthPlan() {
     return (
       <div className="bg-white rounded-lg shadow p-6">
         <div className="text-center py-6">
-          <Tooth className="mx-auto h-12 w-12 text-gray-400" />
+          <Stethoscope className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">Pas de plan de santé</h3>
           <p className="mt-1 text-sm text-gray-500">
             Votre dentiste n'a pas encore créé de plan de santé personnalisé.

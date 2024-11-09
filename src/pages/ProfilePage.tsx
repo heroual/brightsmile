@@ -5,7 +5,7 @@ import { CalendarDays, FileText, Clock, Settings } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import AppointmentList from '../components/profile/AppointmentList';
 import MedicalHistory from '../components/profile/MedicalHistory';
-import OralHealthPlan from '../components/profile/OralHealthPlan';
+import OralHealthPlanView from '../components/profile/OralHealthPlan';
 
 export default function ProfilePage() {
   const { currentUser, userProfile, loading } = useAuth();
@@ -59,7 +59,7 @@ export default function ProfilePage() {
             </section>
 
             <section id="health-plan">
-              <OralHealthPlan />
+              <OralHealthPlanView />
             </section>
 
             <section id="medical-history">
