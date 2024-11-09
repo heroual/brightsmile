@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Plus, Calendar, Clock, AlertCircle, Check, X as XIcon, Edit2 } from 'lucide-react';
+import { Plus, Calendar, Clock, AlertCircle, Check, X, Edit2 } from 'lucide-react';
 import NewAppointmentModal from './NewAppointmentModal';
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -73,7 +73,7 @@ export default function AppointmentList() {
       case 'pending':
         return <Clock className="h-4 w-4 text-yellow-600" />;
       case 'cancelled':
-        return <XIcon className="h-4 w-4 text-red-600" />;
+        return <X className="h-4 w-4 text-red-600" />;
       case 'completed':
         return <Check className="h-4 w-4 text-gray-600" />;
       default:
@@ -169,4 +169,72 @@ export default function AppointmentList() {
                               onClick={() => handleCancelAppointment(appointment.id)}
                               className="flex items-center space-x-1 text-red-600 hover:text-red-700"
                             >
-                              <XIcon
+                              <X className="h-4 w-4" />
+                              <span>Annuler</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* Past Appointments */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Historique des rendez-vous</h3>
+              <div className="space-y-4">
+                {appointments
+                  .filter(apt => !isUpcoming(apt.date, apt.time))
+                  .map((appointment) => (
+                    <div
+                      key={appointment.id}
+                      className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg bg-gray-50"
+                    >
+                      <div className="flex items-start space-x-4">
+                        <div className="bg-gray-200 p-2 rounded-full">
+                          <Calendar className="h-6 w-6 text-gray-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            {formatDate(appointment.date)}
+                          </p>
+                          <p className="text-gray-600">
+                            {appointment.time} - {appointment.reason}
+                          </p>
+                          {appointment.notes && (
+                            <p className="text-sm text-gray-500 mt-1">
+                              Notes: {appointment.notes}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-4 mt-4 md:mt-0">
+                        <span className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(appointment.status)}`}>
+                          {getStatusIcon(appointment.status)}
+                          <span>{appointment.status}</span>
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <Calendar className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">Aucun rendez-vous</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              Commencez par créer un nouveau rendez-vous.
+            </p>
+          </div>
+        )}
+
+        <NewAppointmentModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      </div>
+    </div>
+  );
+}
