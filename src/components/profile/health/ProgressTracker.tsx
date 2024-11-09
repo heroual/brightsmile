@@ -6,9 +6,15 @@ interface ProgressTrackerProps {
   progress: Progress;
   routine: DailyRoutine;
   onUpdateProgress: (date: string, routineType: string, completed: boolean) => void;
+  readOnly?: boolean;
 }
 
-export default function ProgressTracker({ progress, routine, onUpdateProgress }: ProgressTrackerProps) {
+export default function ProgressTracker({ 
+  progress, 
+  routine, 
+  onUpdateProgress,
+  readOnly = false 
+}: ProgressTrackerProps) {
   const [currentWeek, setCurrentWeek] = useState(0);
 
   const getDaysInWeek = (weekOffset: number) => {
@@ -85,9 +91,9 @@ export default function ProgressTracker({ progress, routine, onUpdateProgress }:
                 return (
                   <td key={dateStr} className="px-6 py-4 text-center">
                     <button
-                      onClick={() => onUpdateProgress(dateStr, 'morning', !completed)}
-                      className="focus:outline-none"
-                      disabled={day > new Date()}
+                      onClick={() => !readOnly && onUpdateProgress(dateStr, 'morning', !completed)}
+                      className={`focus:outline-none ${readOnly ? 'cursor-default' : ''}`}
+                      disabled={day > new Date() || readOnly}
                     >
                       {completed ? (
                         <CheckCircle2 className="h-6 w-6 text-green-500" />
@@ -109,9 +115,9 @@ export default function ProgressTracker({ progress, routine, onUpdateProgress }:
                 return (
                   <td key={dateStr} className="px-6 py-4 text-center">
                     <button
-                      onClick={() => onUpdateProgress(dateStr, 'evening', !completed)}
-                      className="focus:outline-none"
-                      disabled={day > new Date()}
+                      onClick={() => !readOnly && onUpdateProgress(dateStr, 'evening', !completed)}
+                      className={`focus:outline-none ${readOnly ? 'cursor-default' : ''}`}
+                      disabled={day > new Date() || readOnly}
                     >
                       {completed ? (
                         <CheckCircle2 className="h-6 w-6 text-green-500" />

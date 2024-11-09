@@ -4,6 +4,7 @@ import { db } from '../firebase';
 import { Calendar, Clock, User, FileText, Plus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import NewAppointmentModal from '../components/profile/NewAppointmentModal';
+import HealthPlanDoctor from '../components/profile/health/HealthPlanDoctor';
 
 export default function DoctorDashboard() {
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -38,7 +39,6 @@ export default function DoctorDashboard() {
         appointments: updatedAppointments
       });
 
-      // Update local state
       setPatients(patients.map(p => 
         p.id === patientId ? { ...p, appointments: updatedAppointments } : p
       ));
@@ -60,7 +60,6 @@ export default function DoctorDashboard() {
         medicalHistory: updatedHistory
       });
 
-      // Update local state
       setPatients(patients.map(p => 
         p.id === patientId ? { ...p, medicalHistory: updatedHistory } : p
       ));
@@ -160,47 +159,53 @@ export default function DoctorDashboard() {
                 </div>
               </div>
 
-              {/* Medical History */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold mb-4">Dossier Médical</h2>
-                <div className="space-y-4">
-                  {selectedPatient.medicalHistory?.map((record: any, index: number) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <FileText className="h-5 w-5 text-blue-500" />
-                        <span className="font-medium">
-                          {new Date(record.date).toLocaleDateString('fr-FR')}
-                        </span>
+              {/* Medical History and Health Plan */}
+              <div className="space-y-6">
+                {/* Medical History */}
+                <div className="bg-white rounded-lg shadow p-6">
+                  <h2 className="text-lg font-semibold mb-4">Dossier Médical</h2>
+                  <div className="space-y-4">
+                    {selectedPatient.medicalHistory?.map((record: any, index: number) => (
+                      <div key={index} className="border rounded-lg p-4">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <FileText className="h-5 w-5 text-blue-500" />
+                          <span className="font-medium">
+                            {new Date(record.date).toLocaleDateString('fr-FR')}
+                          </span>
+                        </div>
+                        <p className="text-gray-600">{record.note}</p>
+                        <p className="text-sm text-gray-500 mt-1">{record.doctor}</p>
                       </div>
-                      <p className="text-gray-600">{record.note}</p>
-                      <p className="text-sm text-gray-500 mt-1">{record.doctor}</p>
-                    </div>
-                  ))}
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      const input = e.currentTarget.elements.namedItem('newRecord') as HTMLInputElement;
-                      if (input.value.trim()) {
-                        updateMedicalHistory(selectedPatient.id, input.value);
-                        input.value = '';
-                      }
-                    }}
-                    className="mt-4"
-                  >
-                    <input
-                      type="text"
-                      name="newRecord"
-                      placeholder="Ajouter une note médicale..."
-                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    />
-                    <button
-                      type="submit"
-                      className="mt-2 w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+                    ))}
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const input = e.currentTarget.elements.namedItem('newRecord') as HTMLInputElement;
+                        if (input.value.trim()) {
+                          updateMedicalHistory(selectedPatient.id, input.value);
+                          input.value = '';
+                        }
+                      }}
+                      className="mt-4"
                     >
-                      Ajouter
-                    </button>
-                  </form>
+                      <input
+                        type="text"
+                        name="newRecord"
+                        placeholder="Ajouter une note médicale..."
+                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      />
+                      <button
+                        type="submit"
+                        className="mt-2 w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+                      >
+                        Ajouter
+                      </button>
+                    </form>
+                  </div>
                 </div>
+
+                {/* Health Plan */}
+                <HealthPlanDoctor patientId={selectedPatient.id} />
               </div>
             </>
           )}
