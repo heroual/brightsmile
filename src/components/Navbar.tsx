@@ -57,6 +57,11 @@ export default function Navbar() {
             } hover:text-blue-600 transition`}>
               Notre Équipe
             </a>
+            <a href="#education" className={`${
+              isScrolled ? 'text-gray-700' : 'text-white'
+            } hover:text-blue-600 transition`}>
+              Éducation
+            </a>
             <a href="#contact" className={`${
               isScrolled ? 'text-gray-700' : 'text-white'
             } hover:text-blue-600 transition`}>
@@ -106,6 +111,13 @@ export default function Navbar() {
               onClick={() => setIsOpen(false)}
             >
               Notre Équipe
+            </a>
+            <a
+              href="#education"
+              className="block px-3 py-2 text-gray-700 hover:text-blue-600 transition"
+              onClick={() => setIsOpen(false)}
+            >
+              Éducation
             </a>
             <a
               href="#contact"
