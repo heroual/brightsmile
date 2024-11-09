@@ -19,18 +19,42 @@ export default function ContentForm({ isOpen, onClose, onSubmit, initialData }: 
     learningObjectives: [{ id: Date.now(), text: '' }] as LearningObjective[],
     materials: [{ id: Date.now(), type: 'text', content: '', title: '' }] as Material[],
     prerequisites: '',
+    published: false,
     status: 'draft'
   });
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        ...initialData,
+        learningObjectives: initialData.learningObjectives || [{ id: Date.now(), text: '' }],
+        materials: initialData.materials || [{ id: Date.now(), type: 'text', content: '', title: '' }]
+      });
+    } else {
+      setFormData({
+        title: '',
+        description: '',
+        category: '',
+        level: 'beginner',
+        duration: '',
+        learningObjectives: [{ id: Date.now(), text: '' }],
+        materials: [{ id: Date.now(), type: 'text', content: '', title: '' }],
+        prerequisites: '',
+        published: false,
+        status: 'draft'
+      });
     }
   }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData);
+    const submissionData = {
+      ...formData,
+      published: formData.status === 'published',
+      createdAt: initialData?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    await onSubmit(submissionData);
   };
 
   const addLearningObjective = () => {
