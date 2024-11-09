@@ -86,8 +86,7 @@ export default function TreatmentManager({ isOpen, onClose }: TreatmentManagerPr
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen px-4">
-        <div <boltAction type="file" filePath="src/components/doctor/payment/TreatmentManager.tsx">        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-
+      <div boltAction type="file" filePath="src/components/doctor/payment/TreatmentManager.tsx">
         <div className="relative bg-white rounded-lg max-w-4xl w-full">
           <div className="absolute right-0 top-0 p-4">
             <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
