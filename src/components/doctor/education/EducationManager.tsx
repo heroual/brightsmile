@@ -10,6 +10,12 @@ export default function EducationManager() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedContent, setSelectedContent] = useState(null);
+  const [filters, setFilters] = useState({
+    search: '',
+    category: 'all',
+    level: 'all',
+    status: 'all'
+  });
   const { content, loading, error, addContent, updateContent, deleteContent } = useEducationalContent();
 
   const handleContentSubmit = async (formData: any) => {
@@ -27,6 +33,18 @@ export default function EducationManager() {
     setIsFormOpen(true);
   };
 
+  const filteredContent = content.filter((item) => {
+    const matchesSearch = item.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+                         item.description.toLowerCase().includes(filters.search.toLowerCase());
+    const matchesCategory = filters.category === 'all' || item.category === filters.category;
+    const matchesLevel = filters.level === 'all' || item.level === filters.level;
+    const matchesStatus = filters.status === 'all' || 
+                         (filters.status === 'published' && item.published) ||
+                         (filters.status === 'draft' && !item.published);
+    
+    return matchesSearch && matchesCategory && matchesLevel && matchesStatus;
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -40,7 +58,7 @@ export default function EducationManager() {
         </button>
       </div>
 
-      <ContentFilters />
+      <ContentFilters filters={filters} onFilterChange={setFilters} />
 
       <div className="flex justify-end space-x-2">
         <button
@@ -67,9 +85,9 @@ export default function EducationManager() {
           ))}
         </div>
       ) : viewMode === 'grid' ? (
-        <ContentGrid content={content} onEdit={handleEdit} onDelete={deleteContent} />
+        <ContentGrid content={filteredContent} onEdit={handleEdit} onDelete={deleteContent} />
       ) : (
-        <ContentList content={content} onEdit={handleEdit} onDelete={deleteContent} />
+        <ContentList content={filteredContent} onEdit={handleEdit} onDelete={deleteContent} />
       )}
 
       <ContentForm
