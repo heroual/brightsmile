@@ -42,31 +42,46 @@ export default function Navbar() {
           </Link>
           
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#services" className={`${
-              isScrolled ? 'text-gray-700' : 'text-white'
-            } hover:text-blue-600 transition`}>
+            <Link
+              to="/#services"
+              className={`${
+                isScrolled ? 'text-gray-700' : 'text-white'
+              } hover:text-blue-600 transition`}
+            >
               Services
-            </a>
-            <a href="#about" className={`${
-              isScrolled ? 'text-gray-700' : 'text-white'
-            } hover:text-blue-600 transition`}>
+            </Link>
+            <Link
+              to="/#about"
+              className={`${
+                isScrolled ? 'text-gray-700' : 'text-white'
+              } hover:text-blue-600 transition`}
+            >
               À Propos
-            </a>
-            <a href="#team" className={`${
-              isScrolled ? 'text-gray-700' : 'text-white'
-            } hover:text-blue-600 transition`}>
+            </Link>
+            <Link
+              to="/#team"
+              className={`${
+                isScrolled ? 'text-gray-700' : 'text-white'
+              } hover:text-blue-600 transition`}
+            >
               Notre Équipe
-            </a>
-            <a href="#education" className={`${
-              isScrolled ? 'text-gray-700' : 'text-white'
-            } hover:text-blue-600 transition`}>
+            </Link>
+            <Link
+              to="/education"
+              className={`${
+                isScrolled ? 'text-gray-700' : 'text-white'
+              } hover:text-blue-600 transition`}
+            >
               Éducation
-            </a>
-            <a href="#contact" className={`${
-              isScrolled ? 'text-gray-700' : 'text-white'
-            } hover:text-blue-600 transition`}>
+            </Link>
+            <Link
+              to="/#contact"
+              className={`${
+                isScrolled ? 'text-gray-700' : 'text-white'
+              } hover:text-blue-600 transition`}
+            >
               Contact
-            </a>
+            </Link>
             <button 
               onClick={handleAuthClick}
               className="flex items-center space-x-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
@@ -91,41 +106,41 @@ export default function Navbar() {
         {/* Mobile menu */}
         <div className={`md:hidden ${isOpen ? 'block' : 'hidden'}`}>
           <div className="px-2 pt-2 pb-3 space-y-1 bg-white rounded-lg shadow-lg">
-            <a
-              href="#services"
+            <Link
+              to="/#services"
               className="block px-3 py-2 text-gray-700 hover:text-blue-600 transition"
               onClick={() => setIsOpen(false)}
             >
               Services
-            </a>
-            <a
-              href="#about"
+            </Link>
+            <Link
+              to="/#about"
               className="block px-3 py-2 text-gray-700 hover:text-blue-600 transition"
               onClick={() => setIsOpen(false)}
             >
               À Propos
-            </a>
-            <a
-              href="#team"
+            </Link>
+            <Link
+              to="/#team"
               className="block px-3 py-2 text-gray-700 hover:text-blue-600 transition"
               onClick={() => setIsOpen(false)}
             >
               Notre Équipe
-            </a>
-            <a
-              href="#education"
+            </Link>
+            <Link
+              to="/education"
               className="block px-3 py-2 text-gray-700 hover:text-blue-600 transition"
               onClick={() => setIsOpen(false)}
             >
               Éducation
-            </a>
-            <a
-              href="#contact"
+            </Link>
+            <Link
+              to="/#contact"
               className="block px-3 py-2 text-gray-700 hover:text-blue-600 transition"
               onClick={() => setIsOpen(false)}
             >
               Contact
-            </a>
+            </Link>
             <button 
               onClick={() => {
                 handleAuthClick();

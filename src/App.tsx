@@ -6,6 +6,7 @@ import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
 import ProfilePage from './pages/ProfilePage';
 import DoctorDashboard from './pages/DoctorDashboard';
+import EducationPage from './pages/EducationPage';
 import PrivateRoute from './components/auth/PrivateRoute';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/education" element={<EducationPage />} />
           <Route 
             path="/doctor" 
             element={
